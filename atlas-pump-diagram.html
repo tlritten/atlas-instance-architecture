@@ -1,0 +1,881 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ATLAS Pump Control — Narrative Template Flow</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Red+Hat+Display:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:        #0f0f0f;
+  --bg-card:   #191919;
+  --bg-hover:  #242424;
+  --border:    #2e2e2e;
+  --text-1:    #e8e8e8;
+  --text-2:    #999;
+  --text-3:    #555;
+  --accent:    #b1ff00;
+  --accent-dim:rgba(177,255,0,0.08);
+  --accent-dim2:rgba(177,255,0,0.14);
+  --blue:      #04b9fb;
+  --blue-dim:  rgba(4,185,251,0.1);
+  --teal:      #00d4a0;
+  --teal-dim:  rgba(0,212,160,0.1);
+  --purple:    #c084fc;
+  --purple-dim:rgba(192,132,252,0.1);
+  --amber:     #f59e0b;
+  --amber-dim: rgba(245,158,11,0.1);
+  --coral:     #fb7c54;
+  --coral-dim: rgba(251,124,84,0.1);
+  --red:       #ef4e4e;
+  --red-dim:   rgba(239,78,78,0.1);
+  --mono: 'JetBrains Mono', monospace;
+  --sans: 'Red Hat Display', sans-serif;
+  --r: 8px;
+  --r-lg: 12px;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: var(--sans);
+  background: var(--bg);
+  color: var(--text-1);
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* ── Header ── */
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 32px;
+  border-bottom: 1px solid var(--border);
+  background: var(--bg-card);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+.header-left { display: flex; align-items: center; gap: 16px; }
+.logo {
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  color: var(--accent);
+}
+.logo span { color: var(--text-1); }
+.divider { width: 1px; height: 20px; background: var(--border); }
+.page-title { font-size: 14px; font-weight: 500; color: var(--text-2); }
+.badge {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  padding: 2px 8px;
+  border-radius: 20px;
+  background: var(--accent-dim);
+  color: var(--accent);
+  border: 1px solid rgba(177,255,0,0.2);
+}
+
+/* ── Layer Tabs ── */
+.tabs {
+  display: flex;
+  gap: 2px;
+  padding: 0 32px;
+  background: var(--bg-card);
+  border-bottom: 1px solid var(--border);
+}
+.tab {
+  padding: 12px 20px;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text-3);
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  transition: all 0.15s;
+  user-select: none;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.tab:hover { color: var(--text-2); }
+.tab.active { color: var(--text-1); border-bottom-color: var(--accent); }
+.tab-dot {
+  width: 7px; height: 7px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+/* ── Main Layout ── */
+.layout {
+  display: flex;
+  height: calc(100vh - 97px);
+}
+
+/* ── Diagram Canvas ── */
+.canvas {
+  flex: 1;
+  overflow: auto;
+  padding: 40px 32px;
+  position: relative;
+}
+
+/* ── Detail Panel ── */
+.panel {
+  width: 320px;
+  flex-shrink: 0;
+  border-left: 1px solid var(--border);
+  background: var(--bg-card);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  transition: width 0.25s ease;
+}
+.panel.collapsed { width: 0; overflow: hidden; }
+.panel-inner { padding: 24px; overflow-y: auto; flex: 1; min-width: 320px; }
+.panel-header {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  color: var(--text-3);
+  text-transform: uppercase;
+  margin-bottom: 12px;
+}
+.panel-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text-1);
+  margin-bottom: 6px;
+  line-height: 1.3;
+}
+.panel-type {
+  font-size: 11px;
+  font-weight: 500;
+  padding: 2px 8px;
+  border-radius: 20px;
+  display: inline-block;
+  margin-bottom: 16px;
+}
+.panel-body {
+  font-size: 13px;
+  color: var(--text-2);
+  line-height: 1.7;
+  margin-bottom: 16px;
+}
+.panel-body p { margin-bottom: 10px; }
+.panel-body p:last-child { margin-bottom: 0; }
+.expr-block {
+  background: #111;
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+  padding: 12px 14px;
+  font-family: var(--mono);
+  font-size: 11.5px;
+  color: var(--accent);
+  margin: 12px 0;
+  line-height: 1.6;
+}
+.expr-block .comment { color: var(--text-3); font-style: italic; }
+.examples {
+  margin-top: 16px;
+  border-top: 1px solid var(--border);
+  padding-top: 16px;
+}
+.examples-label {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  color: var(--text-3);
+  text-transform: uppercase;
+  margin-bottom: 10px;
+}
+.example-chip {
+  display: inline-block;
+  font-family: var(--mono);
+  font-size: 11px;
+  padding: 3px 9px;
+  border-radius: 4px;
+  border: 1px solid var(--border);
+  color: var(--text-2);
+  margin: 3px 3px 3px 0;
+  cursor: pointer;
+  transition: all 0.12s;
+}
+.example-chip:hover { border-color: var(--accent); color: var(--accent); }
+.panel-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  gap: 10px;
+  color: var(--text-3);
+  text-align: center;
+  padding: 24px;
+}
+.panel-empty-icon { font-size: 28px; opacity: 0.4; }
+.panel-empty-text { font-size: 13px; line-height: 1.5; }
+
+/* ── Layer Label ── */
+.layer-label {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  color: var(--text-3);
+  text-transform: uppercase;
+  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.layer-label::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--border);
+}
+
+/* ── Diagram Nodes ── */
+.node {
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.node rect, .node .node-rect {
+  transition: all 0.15s;
+}
+.node:hover rect, .node:hover .node-rect {
+  filter: brightness(1.15);
+}
+.node.selected rect, .node.selected .node-rect {
+  stroke-width: 1.5 !important;
+}
+
+/* ── Flow Arrow ── */
+svg .arr { stroke: var(--text-3); }
+
+/* ── Legend ── */
+.legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px 20px;
+  margin-bottom: 28px;
+  padding: 14px 18px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--r-lg);
+}
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 11px;
+  color: var(--text-2);
+}
+.legend-dot {
+  width: 10px; height: 10px;
+  border-radius: 3px;
+  flex-shrink: 0;
+}
+
+/* scrollbar */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+
+/* ── Full-flow view ── */
+.flow-connector {
+  display: flex;
+  align-items: flex-start;
+  gap: 0;
+  overflow-x: auto;
+  padding-bottom: 16px;
+}
+.flow-group {
+  flex-shrink: 0;
+}
+.flow-arrow-col {
+  display: flex;
+  align-items: center;
+  padding-top: 60px;
+  flex-shrink: 0;
+}
+.arrow-svg { flex-shrink: 0; }
+
+/* Animations */
+@keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+.canvas-content { animation: fadeIn 0.2s ease; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-left">
+    <div class="logo">ATLAS<span>CONFIG</span></div>
+    <div class="divider"></div>
+    <div class="page-title">Narrative Template · Pump Control</div>
+  </div>
+  <div class="badge">Interactive Flow</div>
+</div>
+
+<div class="tabs">
+  <div class="tab active" data-layer="all" onclick="setLayer('all')">
+    <div class="tab-dot" style="background:#555"></div>
+    Full flow
+  </div>
+  <div class="tab" data-layer="inputs" onclick="setLayer('inputs')">
+    <div class="tab-dot" style="background:var(--blue)"></div>
+    Layer 1 — Inputs
+  </div>
+  <div class="tab" data-layer="compute" onclick="setLayer('compute')">
+    <div class="tab-dot" style="background:var(--purple)"></div>
+    Layer 2 — Computation
+  </div>
+  <div class="tab" data-layer="outputs" onclick="setLayer('outputs')">
+    <div class="tab-dot" style="background:var(--teal)"></div>
+    Layer 3 — Outputs
+  </div>
+</div>
+
+<div class="layout">
+  <div class="canvas" id="canvas">
+    <div class="canvas-content" id="canvas-content"></div>
+  </div>
+  <div class="panel" id="panel">
+    <div class="panel-inner" id="panel-inner">
+      <div class="panel-empty" id="panel-empty">
+        <div class="panel-empty-icon">⟶</div>
+        <div class="panel-empty-text">Click any node to see details</div>
+      </div>
+      <div id="panel-detail" style="display:none"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+const DATA = {
+  hw_io: {
+    title: 'Hardware I/O',
+    type: 'Input source', typeColor: 'var(--blue)',
+    body: `<p>Real-time signals read directly from physical hardware — sensors and actuators wired to the controller's I/O points.</p><p>These are the ground-truth signals about what the pump is physically doing at any given moment.</p>`,
+    expr: null,
+    examples: ['runStatus','runCMD']
+  },
+  inter_instance: {
+    title: 'Inter-instance signals',
+    type: 'Input source', typeColor: 'var(--blue)',
+    body: `<p>Data fed in from other Narrative Instances running on the same system — allowing coordination between multiple pieces of equipment.</p><p>For example, a boiler instance might grant <code style="font-family:var(--mono);color:var(--accent)">RunPermission</code> to the pump, or a scheduler might set <code style="font-family:var(--mono);color:var(--accent)">AutoRunRequest</code>.</p>`,
+    expr: null,
+    examples: ['AutoRunRequest','RunPermission']
+  },
+  settings: {
+    title: 'Settings',
+    type: 'Configuration', typeColor: 'var(--teal)',
+    body: `<p>Installer, user, or app-defined configuration values. Each setting has a type, units, and a default value baked into the template.</p><p>Instances can override defaults; the template defines the structure.</p>`,
+    expr: null,
+    examples: ['AutoEnabled','MaxStartTimeSP','MaxStopTimeSP','ServiceIntervalSP','OutOfService']
+  },
+  inputs_node: {
+    title: 'Inputs node',
+    type: 'Template component', typeColor: 'var(--blue)',
+    body: `<p>The formal entry point for all live data. The Inputs node defines what signals the template expects (type and units), but carries no I/O mappings — those only exist on instances.</p><p>This is what makes templates reusable: the same template can drive pump #1 and pump #47 once each instance maps its own hardware.</p>`,
+    expr: null,
+    examples: ['runStatus (I/O Discrete Input)','runCMD (I/O Discrete Output)']
+  },
+  conditions: {
+    title: 'Conditions',
+    type: 'Computed boolean', typeColor: 'var(--purple)',
+    body: `<p>Boolean expressions evaluated continuously. Each condition is a named true/false result built from inputs, settings, and other conditions.</p><p>Conditions are the primary trigger for state transitions and alarms.</p>`,
+    expr: `<span class="comment">// Example expression</span>\ntimerDelay(runCMD) &&\n(runStatus, MaxStartTime)`,
+    examples: ['StartRequested','StopRequested','FailedToStart','FailedToStop','OutOfService','ServiceDue']
+  },
+  metrics: {
+    title: 'Metrics',
+    type: 'Computed number', typeColor: 'var(--coral)',
+    body: `<p>Numeric computations that accumulate or aggregate over time. Unlike conditions (true/false), metrics produce values with units — hours, counts, etc.</p><p>Metrics feed into conditions (e.g. "has TotalRunHours exceeded ServiceIntervalSP?") and are exposed on dashboards.</p>`,
+    expr: `<span class="comment">// Retentive timer example</span>\ntimerRetentive(runStatus)\n→ TotalRunHours`,
+    examples: ['TotalRunHours','MaintCycleRunHours','FailedStartCount','FailedStopCount']
+  },
+  unknownST: {
+    title: 'UnknownST',
+    type: 'Default state', typeColor: 'var(--text-3)',
+    body: `<p>The default fallback state. The pump is in UnknownST when none of the other state conditions are satisfied — typically at startup or during a fault that prevents classification.</p>`,
+    expr: null,
+    examples: []
+  },
+  startingST: {
+    title: 'StartingST',
+    type: 'Transition state', typeColor: 'var(--amber)',
+    body: `<p>The "command sent, waiting for confirmation" state. A start has been commanded but the physical feedback hasn't confirmed running yet.</p><p>If runStatus doesn't confirm running within MaxStartTimeSP, the pump transitions to a FailedToStart alarm condition.</p>`,
+    expr: `runStatus &&\nStartRequested`,
+    examples: []
+  },
+  runningST: {
+    title: 'RunningST',
+    type: 'Feedback state', typeColor: 'var(--teal)',
+    body: `<p>Confirmed running. The pump's hardware feedback signal shows it is physically spinning AND no stop has been requested or failed.</p><p>This is a <em>feedback</em> state — the system has hardware proof, not just an assumption. If runStatus drops unexpectedly, ATLAS detects the mismatch and fires "Pump Unexpectedly Stopped".</p>`,
+    expr: `runStatus &&\n!(StopRequested ||\n  FailedToStop)`,
+    examples: []
+  },
+  stoppingST: {
+    title: 'StoppingST',
+    type: 'Transition state', typeColor: 'var(--amber)',
+    body: `<p>A stop has been commanded but the pump hasn't physically stopped yet. Similar to StartingST, this is a transient state with a timeout — MaxStopTimeSP.</p><p>Expiry without confirmation triggers FailedToStop.</p>`,
+    expr: `runStatus &&\n(StopRequested ||\n OutOfService)`,
+    examples: []
+  },
+  stoppedST: {
+    title: 'StoppedST',
+    type: 'Feedback state', typeColor: 'var(--teal)',
+    body: `<p>Confirmed stopped. Hardware feedback shows the pump is not running AND it wasn't expected to be running. A "clean" off state.</p><p>If runStatus goes true without a start command, ATLAS fires "Pump Unexpectedly Started".</p>`,
+    expr: `!runStatus &&\n!(StartRequested ||\n  FailedToStart)`,
+    examples: []
+  },
+  outputs: {
+    title: 'Outputs',
+    type: 'I/O effect', typeColor: 'var(--blue)',
+    body: `<p>Each state writes one or more values to physical I/O — the actual signal sent to the pump's control wiring.</p><p>Templates define the output logic; instances provide the mapping to real hardware points. Each state can have multiple outputs.</p>`,
+    expr: `<span class="comment">// StartingST / RunningST</span>\nrunCMD = True\n\n<span class="comment">// StoppingST / StoppedST</span>\nrunCMD = False`,
+    examples: ['runCMD (I/O Discrete Output)']
+  },
+  alarms: {
+    title: 'Alarms',
+    type: 'Fault notification', typeColor: 'var(--red)',
+    body: `<p>Abnormal conditions surfaced to operators via the Alarm Manager. Alarms are driven by the same conditions that power state logic — the condition that detects a fault is also the alarm cause.</p><p>This dual-use makes alarms tightly integrated with control logic rather than bolted on separately.</p>`,
+    expr: null,
+    examples: ['Pump Failed to Start','Pump Failed to Stop','Pump Unexpectedly Started','Pump Unexpectedly Stopped','Pump is Due for Service']
+  }
+};
+
+let activeLayer = 'all';
+let selectedNode = null;
+
+function setLayer(layer) {
+  activeLayer = layer;
+  document.querySelectorAll('.tab').forEach(t => {
+    t.classList.toggle('active', t.dataset.layer === layer);
+  });
+  render();
+}
+
+function selectNode(key) {
+  selectedNode = key;
+  document.querySelectorAll('.node').forEach(n => {
+    n.classList.toggle('selected', n.dataset.key === key);
+  });
+  showPanel(key);
+}
+
+function showPanel(key) {
+  const d = DATA[key];
+  if (!d) return;
+  document.getElementById('panel-empty').style.display = 'none';
+  const det = document.getElementById('panel-detail');
+  det.style.display = 'block';
+  det.innerHTML = `
+    <div class="panel-header">Node detail</div>
+    <div class="panel-title">${d.title}</div>
+    <div class="panel-type" style="background:${d.typeColor}18;color:${d.typeColor};border:1px solid ${d.typeColor}33">${d.type}</div>
+    <div class="panel-body">${d.body}</div>
+    ${d.expr ? `<div class="expr-block">${d.expr}</div>` : ''}
+    ${d.examples && d.examples.length ? `
+      <div class="examples">
+        <div class="examples-label">Examples</div>
+        ${d.examples.map(e => `<span class="example-chip">${e}</span>`).join('')}
+      </div>` : ''}
+  `;
+}
+
+// ─── SVG builders ────────────────────────────────────────
+
+function mkArrow() {
+  return `<defs><marker id="arr" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M2 1L8 5L2 9" fill="none" stroke="#555" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></marker></defs>`;
+}
+
+function node(key, x, y, w, h, label, sub, color, rx=8) {
+  const d = DATA[key] || {};
+  return `
+<g class="node" data-key="${key}" onclick="selectNode('${key}')" style="cursor:pointer">
+  <rect x="${x}" y="${y}" width="${w}" height="${h}" rx="${rx}"
+    fill="${color}14" stroke="${color}" stroke-width="0.75"/>
+  <text font-family="'Red Hat Display',sans-serif" font-size="13" font-weight="500"
+    fill="${color}" text-anchor="middle" dominant-baseline="central"
+    x="${x+w/2}" y="${sub ? y+h/2-9 : y+h/2}">${label}</text>
+  ${sub ? `<text font-family="'Red Hat Display',sans-serif" font-size="11" font-weight="400"
+    fill="${color}99" text-anchor="middle" dominant-baseline="central"
+    x="${x+w/2}" y="${y+h/2+10}">${sub}</text>` : ''}
+</g>`;
+}
+
+function arrow(x1,y1,x2,y2,bend=false) {
+  if (bend) {
+    const mx = (x1+x2)/2;
+    return `<path d="M${x1} ${y1} L${mx} ${y1} L${mx} ${y2} L${x2} ${y2}"
+      fill="none" stroke="#3a3a3a" stroke-width="1" marker-end="url(#arr)"/>`;
+  }
+  return `<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}"
+    stroke="#3a3a3a" stroke-width="1" marker-end="url(#arr)"/>`;
+}
+
+function dashedArrow(x1,y1,x2,y2) {
+  return `<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}"
+    stroke="#3a3a3a" stroke-width="1" stroke-dasharray="5 4" marker-end="url(#arr)"/>`;
+}
+
+// ─── Layer renders ────────────────────────────────────────
+
+function renderInputs() {
+  return `
+<svg width="580" height="320" viewBox="0 0 580 320" font-family="'Red Hat Display',sans-serif">
+${mkArrow()}
+
+<!-- Sources -->
+${node('hw_io',      20, 40, 150, 52, 'Hardware I/O', 'runStatus · runCMD', '#04b9fb')}
+${node('inter_instance', 20, 108, 150, 52, 'Inter-instance', 'RunPermission · AutoRun', '#04b9fb')}
+${node('settings',   20, 176, 150, 72, 'Settings', 'AutoEnabled · MaxStartTimeSP…', '#00d4a0')}
+
+<!-- Who sets settings label -->
+<text font-family="'Red Hat Display',sans-serif" font-size="10" fill="#555" x="24" y="264">Defined by:</text>
+<text font-family="'Red Hat Display',sans-serif" font-size="10" fill="#3a7a6a" x="80" y="264">installer · user · app</text>
+
+<!-- Collector nodes -->
+${node('inputs_node', 230, 60, 140, 48, 'Inputs node', 'live data', '#04b9fb')}
+<rect x="230" y="170" width="140" height="48" rx="8" fill="#00d4a014" stroke="#00d4a0" stroke-width="0.75"/>
+<text font-family="'Red Hat Display',sans-serif" font-size="13" font-weight="500" fill="#00d4a0" text-anchor="middle" dominant-baseline="central" x="300" y="186">Settings node</text>
+<text font-family="'Red Hat Display',sans-serif" font-size="11" fill="#00d4a099" text-anchor="middle" dominant-baseline="central" x="300" y="202">config values</text>
+
+<!-- Arrows in -->
+${arrow(170,66,229,80)}
+${arrow(170,134,229,90)}
+${arrow(170,212,229,194)}
+
+<!-- Arrows out to layer 2 -->
+${arrow(370,84,430,84)}
+${arrow(370,194,430,194)}
+
+<!-- "to Layer 2" labels -->
+<text font-family="'Red Hat Display',sans-serif" font-size="10" fill="#444" x="436" y="80">to Layer 2</text>
+<text font-family="'Red Hat Display',sans-serif" font-size="10" fill="#444" x="436" y="190">to Layer 2</text>
+
+<!-- No mapping note -->
+<rect x="230" y="240" width="140" height="52" rx="8" fill="none" stroke="#2e2e2e" stroke-dasharray="5 3" stroke-width="1"/>
+<text font-family="'Red Hat Display',sans-serif" font-size="10.5" fill="#555" text-anchor="middle" x="300" y="260">Templates have</text>
+<text font-family="'Red Hat Display',sans-serif" font-size="10.5" fill="#555" text-anchor="middle" x="300" y="275">no I/O mappings</text>
+<text font-family="'Red Hat Display',sans-serif" font-size="10" fill="#333" text-anchor="middle" x="300" y="289">instances do</text>
+</svg>`;
+}
+
+function renderCompute() {
+  return `
+<svg width="540" height="360" viewBox="0 0 540 360" font-family="'Red Hat Display',sans-serif">
+${mkArrow()}
+
+<!-- Incoming -->
+${node('inputs_node', 20, 90,  100, 40, 'Inputs', null, '#04b9fb')}
+${node('settings',    20, 148, 100, 40, 'Settings', null, '#00d4a0')}
+
+<!-- CONDITIONS -->
+<text font-family="'Red Hat Display',sans-serif" font-size="10" font-weight="600" letter-spacing="1" fill="#555" x="174" y="36">CONDITIONS</text>
+<text font-family="'Red Hat Display',sans-serif" font-size="10" fill="#444" x="174" y="50">calculated booleans</text>
+
+${node('conditions', 168, 64,  168, 38, 'StartRequested',  null, '#c084fc')}
+<g class="node" data-key="conditions" onclick="selectNode('conditions')" style="cursor:pointer">
+  <rect x="168" y="110" width="168" height="38" rx="8" fill="#c084fc14" stroke="#c084fc" stroke-width="0.75"/>
+  <text font-size="13" font-weight="500" fill="#c084fc" text-anchor="middle" dominant-baseline="central" x="252" y="129">StopRequested</text>
+</g>
+<g class="node" data-key="conditions" onclick="selectNode('conditions')" style="cursor:pointer">
+  <rect x="168" y="156" width="168" height="38" rx="8" fill="#c084fc14" stroke="#c084fc" stroke-width="0.75"/>
+  <text font-size="13" font-weight="500" fill="#c084fc" text-anchor="middle" dominant-baseline="central" x="252" y="175">FailedToStart</text>
+</g>
+<g class="node" data-key="conditions" onclick="selectNode('conditions')" style="cursor:pointer">
+  <rect x="168" y="202" width="168" height="38" rx="8" fill="#c084fc14" stroke="#c084fc" stroke-width="0.75"/>
+  <text font-size="13" font-weight="500" fill="#c084fc" text-anchor="middle" dominant-baseline="central" x="252" y="221">ServiceDue</text>
+</g>
+
+<!-- Expression example -->
+<rect x="168" y="256" width="168" height="48" rx="8" fill="none" stroke="#2a2a2a" stroke-dasharray="4 3" stroke-width="1"/>
+<text font-family="'JetBrains Mono',monospace" font-size="10" fill="#b1ff00" x="178" y="274">timerDelay(runCMD)</text>
+<text font-family="'JetBrains Mono',monospace" font-size="10" fill="#b1ff00" x="178" y="290">&amp;&amp; runStatus</text>
+<text font-family="'Red Hat Display',sans-serif" font-size="9" fill="#444" x="178" y="300">expression example</text>
+
+<!-- METRICS -->
+<text font-family="'Red Hat Display',sans-serif" font-size="10" font-weight="600" letter-spacing="1" fill="#555" x="374" y="36">METRICS</text>
+<text font-family="'Red Hat Display',sans-serif" font-size="10" fill="#444" x="374" y="50">calculated numbers</text>
+
+${node('metrics', 368, 64, 152, 38, 'TotalRunHours', null, '#fb7c54')}
+<g class="node" data-key="metrics" onclick="selectNode('metrics')" style="cursor:pointer">
+  <rect x="368" y="110" width="152" height="38" rx="8" fill="#fb7c5414" stroke="#fb7c54" stroke-width="0.75"/>
+  <text font-size="13" font-weight="500" fill="#fb7c54" text-anchor="middle" dominant-baseline="central" x="444" y="129">FailedStartCount</text>
+</g>
+<g class="node" data-key="metrics" onclick="selectNode('metrics')" style="cursor:pointer">
+  <rect x="368" y="156" width="152" height="38" rx="8" fill="#fb7c5414" stroke="#fb7c54" stroke-width="0.75"/>
+  <text font-size="13" font-weight="500" fill="#fb7c54" text-anchor="middle" dominant-baseline="central" x="444" y="175">MaintCycleHours</text>
+</g>
+<g class="node" data-key="metrics" onclick="selectNode('metrics')" style="cursor:pointer">
+  <rect x="368" y="202" width="152" height="38" rx="8" fill="#fb7c5414" stroke="#fb7c54" stroke-width="0.75"/>
+  <text font-size="13" font-weight="500" fill="#fb7c54" text-anchor="middle" dominant-baseline="central" x="444" y="221">FailedStopCount</text>
+</g>
+
+<rect x="368" y="256" width="152" height="48" rx="8" fill="none" stroke="#2a2a2a" stroke-dasharray="4 3" stroke-width="1"/>
+<text font-family="'JetBrains Mono',monospace" font-size="10" fill="#b1ff00" x="378" y="274">timerRetentive</text>
+<text font-family="'JetBrains Mono',monospace" font-size="10" fill="#b1ff00" x="378" y="290">(runStatus)</text>
+<text font-family="'Red Hat Display',sans-serif" font-size="9" fill="#444" x="378" y="300">expression example</text>
+
+<!-- Feed arrows -->
+${arrow(120,110,167,100)}
+${arrow(120,168,167,130)}
+${arrow(120,110,367,90)}
+${arrow(120,168,367,140)}
+
+<!-- Out arrows -->
+${arrow(336,120,358,120)}
+</svg>`;
+}
+
+function renderOutputs() {
+  const stateY = [60, 120, 188, 256, 324];
+  const stateH = 50;
+  const labels = ['UnknownST','StartingST','RunningST','StoppingST','StoppedST'];
+  const types  = ['default','transition','feedback','transition','feedback'];
+  const keys   = ['unknownST','startingST','runningST','stoppingST','stoppedST'];
+  const colors = ['#555','#f59e0b','#00d4a0','#f59e0b','#00d4a0'];
+  const outLabels = ['—','runCMD = True','runCMD = True','runCMD = False','runCMD = False'];
+
+  let states = '';
+  let outNodes = '';
+  let stateArrows = '';
+  let outArrows = '';
+
+  stateY.forEach((y,i) => {
+    if (i === 0) {
+      states += `<g class="node" data-key="${keys[i]}" onclick="selectNode('${keys[i]}')" style="cursor:pointer">
+        <rect x="140" y="${y}" width="150" height="${stateH}" rx="8" fill="#55555512" stroke="#555555" stroke-width="0.75"/>
+        <text font-size="13" font-weight="500" fill="#888" text-anchor="middle" dominant-baseline="central" x="215" y="${y+stateH/2-8}">${labels[i]}</text>
+        <text font-size="10" fill="#444" text-anchor="middle" dominant-baseline="central" x="215" y="${y+stateH/2+9}">${types[i]}</text>
+      </g>`;
+    } else {
+      states += `<g class="node" data-key="${keys[i]}" onclick="selectNode('${keys[i]}')" style="cursor:pointer">
+        <rect x="140" y="${y}" width="150" height="${stateH}" rx="8" fill="${colors[i]}12" stroke="${colors[i]}" stroke-width="0.75"/>
+        <text font-size="13" font-weight="500" fill="${colors[i]}" text-anchor="middle" dominant-baseline="central" x="215" y="${y+stateH/2-8}">${labels[i]}</text>
+        <text font-size="10" fill="${colors[i]}88" text-anchor="middle" dominant-baseline="central" x="215" y="${y+stateH/2+9}">${types[i]}</text>
+      </g>`;
+
+      outNodes += `<g class="node" data-key="outputs" onclick="selectNode('outputs')" style="cursor:pointer">
+        <rect x="340" y="${y}" width="160" height="${stateH}" rx="8" fill="#04b9fb12" stroke="#04b9fb" stroke-width="0.75"/>
+        <text font-family="'JetBrains Mono',monospace" font-size="11.5" fill="#04b9fb" text-anchor="middle" dominant-baseline="central" x="420" y="${y+stateH/2}">${outLabels[i]}</text>
+      </g>`;
+
+      outArrows += arrow(290, y+stateH/2, 339, y+stateH/2);
+    }
+
+    // arrows from incoming conditions
+    stateArrows += arrow(110, 180, 139, y+stateH/2, true);
+  });
+
+  return `
+<svg width="560" height="430" viewBox="0 0 560 430" font-family="'Red Hat Display',sans-serif">
+${mkArrow()}
+
+<!-- Incoming -->
+<g class="node" data-key="conditions" onclick="selectNode('conditions')" style="cursor:pointer">
+  <rect x="20" y="136" width="90" height="40" rx="8" fill="#c084fc14" stroke="#c084fc" stroke-width="0.75"/>
+  <text font-size="12" font-weight="500" fill="#c084fc" text-anchor="middle" dominant-baseline="central" x="65" y="156">Conditions</text>
+</g>
+<g class="node" data-key="metrics" onclick="selectNode('metrics')" style="cursor:pointer">
+  <rect x="20" y="192" width="90" height="40" rx="8" fill="#fb7c5414" stroke="#fb7c54" stroke-width="0.75"/>
+  <text font-size="12" font-weight="500" fill="#fb7c54" text-anchor="middle" dominant-baseline="central" x="65" y="212">Metrics</text>
+</g>
+
+<!-- Column headers -->
+<text font-family="'Red Hat Display',sans-serif" font-size="10" font-weight="600" letter-spacing="1" fill="#555" x="140" y="40">STATE MACHINE</text>
+<text font-family="'Red Hat Display',sans-serif" font-size="10" fill="#444" x="140" y="53">conditions drive transitions</text>
+<text font-family="'Red Hat Display',sans-serif" font-size="10" font-weight="600" letter-spacing="1" fill="#555" x="340" y="40">OUTPUTS</text>
+<text font-family="'Red Hat Display',sans-serif" font-size="10" fill="#444" x="340" y="53">per-state I/O writes</text>
+
+${states}
+${outNodes}
+${stateArrows}
+${outArrows}
+
+<!-- Alarms -->
+<g class="node" data-key="alarms" onclick="selectNode('alarms')" style="cursor:pointer">
+  <rect x="140" y="392" width="360" height="34" rx="8" fill="#ef4e4e12" stroke="#ef4e4e" stroke-width="0.75"/>
+  <text font-size="12" font-weight="500" fill="#ef4e4e" text-anchor="middle" dominant-baseline="central" x="320" y="409">Alarms — FailedToStart · Unexpectedly Stopped · ServiceDue…</text>
+</g>
+
+<!-- Conditions → Alarms dashed -->
+${dashedArrow(65, 232, 65, 408)}
+<path d="M65 408 L139 408" fill="none" stroke="#3a3a3a" stroke-width="1" stroke-dasharray="5 4" marker-end="url(#arr)"/>
+<text font-family="'Red Hat Display',sans-serif" font-size="9" fill="#333" x="20" y="350">conditions</text>
+<text font-family="'Red Hat Display',sans-serif" font-size="9" fill="#333" x="20" y="361">trigger</text>
+<text font-family="'Red Hat Display',sans-serif" font-size="9" fill="#333" x="20" y="372">alarms too</text>
+</svg>`;
+}
+
+function renderAll() {
+  // Full flow: three panels with connecting arrows
+  return `
+<div style="display:flex;align-items:flex-start;gap:0;overflow-x:auto;padding-bottom:8px">
+
+  <!-- Layer 1 -->
+  <div style="flex-shrink:0">
+    <div style="font-size:9px;font-weight:600;letter-spacing:0.1em;color:#555;text-transform:uppercase;margin-bottom:12px;padding-left:2px">
+      Layer 1 — Inputs
+    </div>
+    <svg width="360" height="340" viewBox="0 0 360 340" font-family="'Red Hat Display',sans-serif">
+      ${mkArrow()}
+      ${node('hw_io',          16, 40,  148, 48, 'Hardware I/O',    'runStatus · runCMD',    '#04b9fb')}
+      ${node('inter_instance', 16, 100, 148, 48, 'Inter-instance',  'RunPermission · AutoRun','#04b9fb')}
+      ${node('settings',       16, 162, 148, 68, 'Settings',        'AutoEnabled · Timers…',  '#00d4a0')}
+      ${node('inputs_node',    210, 76, 128, 44, 'Inputs node',     'live data',              '#04b9fb')}
+      <rect x="210" y="168" width="128" height="44" rx="8" fill="#00d4a014" stroke="#00d4a0" stroke-width="0.75"/>
+      <text font-size="13" font-weight="500" fill="#00d4a0" text-anchor="middle" dominant-baseline="central" x="274" y="183">Settings node</text>
+      <text font-size="10" fill="#00d4a099" text-anchor="middle" dominant-baseline="central" x="274" y="198">config values</text>
+      ${arrow(164, 64, 209, 90)}
+      ${arrow(164, 124, 209, 100)}
+      ${arrow(164, 196, 209, 190)}
+      <rect x="210" y="246" width="128" height="46" rx="8" fill="none" stroke="#2a2a2a" stroke-dasharray="5 3" stroke-width="1"/>
+      <text font-size="10" fill="#555" text-anchor="middle" x="274" y="263">No I/O mappings</text>
+      <text font-size="10" fill="#333" text-anchor="middle" x="274" y="278">on templates —</text>
+      <text font-size="10" fill="#333" text-anchor="middle" x="274" y="292">only on instances</text>
+    </svg>
+  </div>
+
+  <!-- Arrow col 1→2 -->
+  <div style="display:flex;align-items:center;padding-top:80px;flex-shrink:0">
+    <svg width="48" height="60" viewBox="0 0 48 60" style="overflow:visible">
+      ${mkArrow()}
+      <line x1="2" y1="18" x2="38" y2="18" stroke="#3a3a3a" stroke-width="1" marker-end="url(#arr)"/>
+      <line x1="2" y1="38" x2="38" y2="38" stroke="#3a3a3a" stroke-width="1" marker-end="url(#arr)"/>
+    </svg>
+  </div>
+
+  <!-- Layer 2 -->
+  <div style="flex-shrink:0">
+    <div style="font-size:9px;font-weight:600;letter-spacing:0.1em;color:#555;text-transform:uppercase;margin-bottom:12px;padding-left:2px">
+      Layer 2 — Computation
+    </div>
+    <svg width="340" height="340" viewBox="0 0 340 340" font-family="'Red Hat Display',sans-serif">
+      ${mkArrow()}
+      <text font-size="9" font-weight="600" letter-spacing="1" fill="#555" x="16" y="30">CONDITIONS</text>
+      ${node('conditions', 10, 40, 148, 38, 'StartRequested', null, '#c084fc')}
+      <g class="node" data-key="conditions" onclick="selectNode('conditions')" style="cursor:pointer">
+        <rect x="10" y="86" width="148" height="38" rx="8" fill="#c084fc14" stroke="#c084fc" stroke-width="0.75"/>
+        <text font-size="13" font-weight="500" fill="#c084fc" text-anchor="middle" dominant-baseline="central" x="84" y="105">StopRequested</text>
+      </g>
+      <g class="node" data-key="conditions" onclick="selectNode('conditions')" style="cursor:pointer">
+        <rect x="10" y="132" width="148" height="38" rx="8" fill="#c084fc14" stroke="#c084fc" stroke-width="0.75"/>
+        <text font-size="13" font-weight="500" fill="#c084fc" text-anchor="middle" dominant-baseline="central" x="84" y="151">FailedToStart</text>
+      </g>
+      <g class="node" data-key="conditions" onclick="selectNode('conditions')" style="cursor:pointer">
+        <rect x="10" y="178" width="148" height="38" rx="8" fill="#c084fc14" stroke="#c084fc" stroke-width="0.75"/>
+        <text font-size="13" font-weight="500" fill="#c084fc" text-anchor="middle" dominant-baseline="central" x="84" y="197">ServiceDue</text>
+      </g>
+
+      <text font-size="9" font-weight="600" letter-spacing="1" fill="#555" x="178" y="30">METRICS</text>
+      ${node('metrics', 172, 40, 154, 38, 'TotalRunHours', null, '#fb7c54')}
+      <g class="node" data-key="metrics" onclick="selectNode('metrics')" style="cursor:pointer">
+        <rect x="172" y="86" width="154" height="38" rx="8" fill="#fb7c5414" stroke="#fb7c54" stroke-width="0.75"/>
+        <text font-size="13" font-weight="500" fill="#fb7c54" text-anchor="middle" dominant-baseline="central" x="249" y="105">FailedStartCount</text>
+      </g>
+      <g class="node" data-key="metrics" onclick="selectNode('metrics')" style="cursor:pointer">
+        <rect x="172" y="132" width="154" height="38" rx="8" fill="#fb7c5414" stroke="#fb7c54" stroke-width="0.75"/>
+        <text font-size="13" font-weight="500" fill="#fb7c54" text-anchor="middle" dominant-baseline="central" x="249" y="151">MaintCycleHours</text>
+      </g>
+      <g class="node" data-key="metrics" onclick="selectNode('metrics')" style="cursor:pointer">
+        <rect x="172" y="178" width="154" height="38" rx="8" fill="#fb7c5414" stroke="#fb7c54" stroke-width="0.75"/>
+        <text font-size="13" font-weight="500" fill="#fb7c54" text-anchor="middle" dominant-baseline="central" x="249" y="197">FailedStopCount</text>
+      </g>
+    </svg>
+  </div>
+
+  <!-- Arrow col 2→3 -->
+  <div style="display:flex;align-items:center;padding-top:80px;flex-shrink:0">
+    <svg width="48" height="60" viewBox="0 0 48 60" style="overflow:visible">
+      ${mkArrow()}
+      <line x1="2" y1="28" x2="38" y2="28" stroke="#3a3a3a" stroke-width="1" marker-end="url(#arr)"/>
+    </svg>
+  </div>
+
+  <!-- Layer 3 -->
+  <div style="flex-shrink:0">
+    <div style="font-size:9px;font-weight:600;letter-spacing:0.1em;color:#555;text-transform:uppercase;margin-bottom:12px;padding-left:2px">
+      Layer 3 — State &amp; Outputs
+    </div>
+    <svg width="360" height="340" viewBox="0 0 360 340" font-family="'Red Hat Display',sans-serif">
+      ${mkArrow()}
+
+      <!-- States -->
+      ${node('unknownST',  10, 20, 140, 44, 'UnknownST', 'default', '#666')}
+      ${node('startingST', 10, 74, 140, 44, 'StartingST', 'transition', '#f59e0b')}
+      ${node('runningST',  10, 128, 140, 44, 'RunningST', 'feedback', '#00d4a0')}
+      ${node('stoppingST', 10, 182, 140, 44, 'StoppingST', 'transition', '#f59e0b')}
+      ${node('stoppedST',  10, 236, 140, 44, 'StoppedST', 'feedback', '#00d4a0')}
+
+      <!-- Outputs -->
+      ${node('outputs', 196, 74,  148, 44, 'runCMD = True',  'I/O discrete out', '#04b9fb')}
+      ${node('outputs', 196, 128, 148, 44, 'runCMD = True',  'I/O discrete out', '#04b9fb')}
+      ${node('outputs', 196, 182, 148, 44, 'runCMD = False', 'I/O discrete out', '#04b9fb')}
+      ${node('outputs', 196, 236, 148, 44, 'runCMD = False', 'I/O discrete out', '#04b9fb')}
+
+      ${arrow(150, 96,  195, 96)}
+      ${arrow(150, 150, 195, 150)}
+      ${arrow(150, 204, 195, 204)}
+      ${arrow(150, 258, 195, 258)}
+
+      <!-- Alarms -->
+      ${node('alarms', 10, 298, 334, 34, 'Alarms — FailedToStart · Unexpectedly Stopped · ServiceDue', null, '#ef4e4e')}
+
+      <text font-size="9" fill="#444" x="14" y="293">↑ conditions also fire alarms</text>
+    </svg>
+  </div>
+
+</div>`;
+}
+
+function render() {
+  const container = document.getElementById('canvas-content');
+  // Reset panel if switching layers
+  document.getElementById('panel-empty').style.display = 'flex';
+  document.getElementById('panel-detail').style.display = 'none';
+  selectedNode = null;
+
+  let legendItems = '';
+  if (activeLayer === 'all' || activeLayer === 'inputs') {
+    legendItems += `<div class="legend-item"><div class="legend-dot" style="background:var(--blue)"></div>Hardware / live data</div>
+    <div class="legend-item"><div class="legend-dot" style="background:var(--teal)"></div>Settings / config</div>`;
+  }
+  if (activeLayer === 'all' || activeLayer === 'compute') {
+    legendItems += `<div class="legend-item"><div class="legend-dot" style="background:var(--purple)"></div>Conditions (bool)</div>
+    <div class="legend-item"><div class="legend-dot" style="background:var(--coral)"></div>Metrics (number)</div>`;
+  }
+  if (activeLayer === 'all' || activeLayer === 'outputs') {
+    legendItems += `<div class="legend-item"><div class="legend-dot" style="background:var(--amber)"></div>Transition state</div>
+    <div class="legend-item"><div class="legend-dot" style="background:var(--teal)"></div>Feedback state</div>
+    <div class="legend-item"><div class="legend-dot" style="background:var(--blue)"></div>Output (I/O write)</div>
+    <div class="legend-item"><div class="legend-dot" style="background:var(--red)"></div>Alarm</div>`;
+  }
+
+  let svgContent = '';
+  if (activeLayer === 'inputs')  svgContent = renderInputs();
+  if (activeLayer === 'compute') svgContent = renderCompute();
+  if (activeLayer === 'outputs') svgContent = renderOutputs();
+  if (activeLayer === 'all')     svgContent = renderAll();
+
+  container.innerHTML = `
+    <div class="legend">${legendItems}</div>
+    <div style="overflow-x:auto">${svgContent}</div>
+  `;
+
+  // re-bind after innerHTML replace
+  document.querySelectorAll('.node').forEach(n => {
+    n.addEventListener('click', () => selectNode(n.dataset.key));
+  });
+}
+
+render();
+</script>
+</body>
+</html>
+`;
